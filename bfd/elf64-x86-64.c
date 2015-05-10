@@ -31,6 +31,7 @@
 #include "dwarf2.h"
 #include "libiberty.h"
 
+#include "opcode/i386.h"
 #include "elf/x86-64.h"
 
 #ifdef CORE_HEADER
@@ -1536,6 +1537,7 @@ elf_x86_64_tls_transition (struct bfd_link_info *info, bfd *abfd,
 /* Rename some of the generic section flags to better document how they
    are used here.  */
 #define need_convert_mov_to_lea sec_flg0
+#define need_convert_relax_call sec_flg1
 
 /* Look through the relocs for a section during the first phase, and
    calculate needed space in the global offset table, procedure
@@ -1759,6 +1761,10 @@ elf_x86_64_check_relocs (bfd *abfd, struct bfd_link_info *info,
 	    }
 	  break;
 
+	case R_X86_64_RELAX_GOTPCREL:
+	  sec->need_convert_relax_call = 1;
+	  goto do_got;
+
 	case R_X86_64_GOTTPOFF:
 	  if (!info->executable)
 	    info->flags |= DF_STATIC_TLS;
@@ -1766,13 +1772,13 @@ elf_x86_64_check_relocs (bfd *abfd, struct bfd_link_info *info,
 
 	case R_X86_64_GOT32:
 	case R_X86_64_GOTPCREL:
-	case R_X86_64_RELAX_GOTPCREL:
 	case R_X86_64_TLSGD:
 	case R_X86_64_GOT64:
 	case R_X86_64_GOTPCREL64:
 	case R_X86_64_GOTPLT64:
 	case R_X86_64_GOTPC32_TLSDESC:
 	case R_X86_64_TLSDESC_CALL:
+do_got:
 	  /* This symbol requires a global offset table entry.	*/
 	  {
 	    int tls_type, old_tls_type;
@@ -2892,11 +2898,15 @@ elf_x86_64_readonly_dynrelocs (struct elf_link_hash_entry *h,
    mov foo@GOTPCREL(%rip), %reg
    to
    lea foo(%rip), %reg
-   with the local symbol, foo.  */
+   with the local symbol, foo, and convert
+   call/jmp *foo@GOTRELAX(%rip)
+   to
+   nop call foo/jmp foo nop
+   with the locally defined function, foo.  */
 
 static bfd_boolean
-elf_x86_64_convert_mov_to_lea (bfd *abfd, asection *sec,
-			       struct bfd_link_info *link_info)
+elf_x86_64_convert_mov_and_branch (bfd *abfd, asection *sec,
+				   struct bfd_link_info *link_info)
 {
   Elf_Internal_Shdr *symtab_hdr;
   Elf_Internal_Rela *internal_relocs;
@@ -2913,7 +2923,8 @@ elf_x86_64_convert_mov_to_lea (bfd *abfd, asection *sec,
 
   /* Nothing to do if there is no need or no output.  */
   if ((sec->flags & (SEC_CODE | SEC_RELOC)) != (SEC_CODE | SEC_RELOC)
-      || sec->need_convert_mov_to_lea == 0
+      || (sec->need_convert_mov_to_lea == 0
+	  && sec->need_convert_relax_call == 0)
       || bfd_is_abs_section (sec->output_section))
     return TRUE;
 
@@ -2948,10 +2959,13 @@ elf_x86_64_convert_mov_to_lea (bfd *abfd, asection *sec,
       unsigned int indx;
       struct elf_link_hash_entry *h;
 
-      if (r_type != R_X86_64_GOTPCREL)
+      if (r_type != R_X86_64_GOTPCREL
+	  && (r_symndx < symtab_hdr->sh_info
+	      || r_type != R_X86_64_RELAX_GOTPCREL))
 	continue;
 
-      /* Get the symbol referred to by the reloc.  */
+      /* Try to convert R_X86_64_GOTPCREL.  Get the symbol referred to
+	 by the reloc.  */
       if (r_symndx < symtab_hdr->sh_info)
 	{
 	  Elf_Internal_Sym *isym;
@@ -2983,22 +2997,77 @@ elf_x86_64_convert_mov_to_lea (bfd *abfd, asection *sec,
 	     || h->root.type == bfd_link_hash_warning)
 	h = (struct elf_link_hash_entry *) h->root.u.i.link;
 
-      /* STT_GNU_IFUNC must keep R_X86_64_GOTPCREL relocation.  We also
-	 avoid optimizing _DYNAMIC since ld.so may use its link-time
-	 address.  */
-      if (h->def_regular
-	  && h->type != STT_GNU_IFUNC
-	  && h != htab->elf.hdynamic
-	  && SYMBOL_REFERENCES_LOCAL (link_info, h)
-	  && irel->r_offset >= 2
-	  && bfd_get_8 (abfd, contents + irel->r_offset - 2) == 0x8b)
+      if (r_type == R_X86_64_GOTPCREL)
 	{
-	  bfd_put_8 (abfd, 0x8d, contents + irel->r_offset - 2);
-	  irel->r_info = htab->r_info (r_symndx, R_X86_64_PC32);
-	  if (h->got.refcount > 0)
-	    h->got.refcount -= 1;
-	  changed_contents = TRUE;
-	  changed_relocs = TRUE;
+	  /* STT_GNU_IFUNC must keep R_X86_64_GOTPCREL relocation.  We
+	     also avoid optimizing _DYNAMIC since ld.so may use its
+	     link-time address.  */
+	  if (h->type != STT_GNU_IFUNC
+	      && h->def_regular
+	      && h != htab->elf.hdynamic
+	      && SYMBOL_REFERENCES_LOCAL (link_info, h)
+	      && irel->r_offset >= 2
+	      && bfd_get_8 (abfd, contents + irel->r_offset - 2) == 0x8b)
+	    {
+	      bfd_put_8 (abfd, 0x8d, contents + irel->r_offset - 2);
+	      irel->r_info = htab->r_info (r_symndx, R_X86_64_PC32);
+	      if (h->got.refcount > 0)
+		h->got.refcount -= 1;
+	      changed_contents = TRUE;
+	      changed_relocs = TRUE;
+	    }
+	}
+      else if (r_type == R_X86_64_RELAX_GOTPCREL)
+	{
+	  /* We have "call/jmp *foo@GOTRELAX(%rip)".  STT_GNU_IFUNC must
+	     keep R_X86_64_RELAX_GOTPCREL relocation. */
+	  if (h->type != STT_GNU_IFUNC && h->def_regular)
+	    {
+	      unsigned int val;
+	      unsigned int nop;
+	      bfd_vma nop_offset;
+
+	      BFD_ASSERT (irel->r_offset >= 2
+			  && (bfd_get_8 (abfd,
+					 contents + irel->r_offset - 2)
+			      == 0xff));
+
+	      /* Convert R_X86_64_RELAX_GOTPCREL to R_X86_64_PC32.  */
+	      val = bfd_get_8 (abfd, contents + irel->r_offset - 1);
+	      switch (val)
+		{
+		default:
+		  abort ();
+		case 0x15:
+		  val = 0xe8;
+		  break;
+		case 0x25:
+		  val = 0xe9;
+		  break;
+		}
+	      if (val == 0xe9)
+		{
+		  unsigned int disp;
+		  /* Convert to "jmp foo nop".  */
+		  nop = NOP_OPCODE;
+		  nop_offset = irel->r_offset + 3;
+		  disp = bfd_get_32 (abfd, contents + irel->r_offset);
+		  irel->r_offset -= 1;
+		  bfd_put_32 (abfd, disp, contents + irel->r_offset);
+		}
+	      else
+		{
+		  /* Convert to "nop call foo".  ADDR_PREFIX_OPCODE
+		     is a nop prefix.  */
+		  nop = ADDR_PREFIX_OPCODE;
+		  nop_offset = irel->r_offset - 2;
+		}
+	      bfd_put_8 (abfd, nop, contents + nop_offset);
+	      bfd_put_8 (abfd, val, contents + irel->r_offset - 1);
+	      irel->r_info = htab->r_info (r_symndx, R_X86_64_PC32);
+	      changed_contents = TRUE;
+	      changed_relocs = TRUE;
+	    }
 	}
     }
 
@@ -3088,7 +3157,7 @@ elf_x86_64_size_dynamic_sections (bfd *output_bfd,
 	{
 	  struct elf_dyn_relocs *p;
 
-	  if (!elf_x86_64_convert_mov_to_lea (ibfd, s, info))
+	  if (!elf_x86_64_convert_mov_and_branch (ibfd, s, info))
 	    return FALSE;
 
 	  for (p = (struct elf_dyn_relocs *)
