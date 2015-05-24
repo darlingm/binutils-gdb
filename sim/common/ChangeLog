@@ -1,3 +1,9 @@
+2015-05-24  Michael Darling  <darlingm@gmail.com>
+
+	PR binutils/18450
+	* acinclude.m4: Reflects renaming of configure.in to configure.ac
+	* sim-config.h: Reflects renaming of configure.in to configure.ac
+
 2015-04-29  Nick Clifton  <nickc@redhat.com>
 
 	PR 18273

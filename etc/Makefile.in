@@ -56,7 +56,7 @@ Makefile: $(srcdir)/Makefile.in $(host_makefile_frag) $(target_makefile_frag) \
 	$(SHELL) ./config.status
 
 AUTOCONF = autoconf
-configure_deps = $(srcdir)/configure.in
+configure_deps = $(srcdir)/configure.ac
 
 $(srcdir)/configure: @MAINT@ $(configure_deps)
 	cd $(srcdir) && $(AUTOCONF)

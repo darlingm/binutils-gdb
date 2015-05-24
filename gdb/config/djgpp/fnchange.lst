@@ -470,7 +470,7 @@
 @V@/gdb/testsuite/gdb.gdbtk/c_variable.exp @V@/gdb/testsuite/gdb.tk/c_variable.exp
 @V@/gdb/testsuite/gdb.gdbtk/c_variable.test @V@/gdb/testsuite/gdb.tk/c_variable.test
 @V@/gdb/testsuite/gdb.gdbtk/configure @V@/gdb/testsuite/gdb.tk/configure
-@V@/gdb/testsuite/gdb.gdbtk/configure.in @V@/gdb/testsuite/gdb.tk/configure.in
+@V@/gdb/testsuite/gdb.gdbtk/configure.ac @V@/gdb/testsuite/gdb.tk/configure.ac
 @V@/gdb/testsuite/gdb.gdbtk/console.exp @V@/gdb/testsuite/gdb.tk/console.exp
 @V@/gdb/testsuite/gdb.gdbtk/console.test @V@/gdb/testsuite/gdb.tk/console.test
 @V@/gdb/testsuite/gdb.gdbtk/cpp_variable.cc @V@/gdb/testsuite/gdb.tk/cpp_variable.cc

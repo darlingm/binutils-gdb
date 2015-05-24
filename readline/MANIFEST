@@ -18,7 +18,7 @@ USAGE		f
 aclocal.m4	f
 config.h.in	f
 configure	f
-configure.in	f
+configure.ac	f
 Makefile.in	f
 ansi_stdlib.h	f
 chardefs.h	f
@@ -126,7 +126,7 @@ examples/rlfe/Makefile.in	f
 examples/rlfe/README		f
 examples/rlfe/config.h.in	f
 examples/rlfe/configure		f
-examples/rlfe/configure.in	f
+examples/rlfe/configure.ac	f
 examples/rlfe/extern.h		f
 examples/rlfe/os.h		f
 examples/rlfe/pty.c		f

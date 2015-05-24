@@ -1,3 +1,9 @@
+2015-05-24  Michael Darling  <darlingm@gmail.com>
+
+	PR binutils/18450
+	* MAINTAINERS: Reflects renaming of configure.in to configure.ac
+	* configure: Reflects renaming of configure.in to configure.ac
+
 2015-05-18  Nick Clifton  <nickc@redhat.com>
 
 	PR binutils/18420

@@ -12,7 +12,7 @@ sinclude(libmcheck.m4)
 # This gets GDB_AC_TRANSFORM.
 sinclude(transform.m4)
 
-dnl gdb/configure.in uses BFD_NEED_DECLARATION, so get its definition.
+dnl gdb/configure.ac uses BFD_NEED_DECLARATION, so get its definition.
 sinclude(../bfd/bfd.m4)
 
 dnl This gets the standard macros.

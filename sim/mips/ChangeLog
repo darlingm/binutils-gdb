@@ -1,3 +1,9 @@
+2015-05-24  Michael Darling  <darlingm@gmail.com>
+
+	PR binutils/18450
+	* configure: Reflects renaming of configure.in to configure.ac
+	* configure.ac: Reflects renaming of configure.in to configure.ac
+
 2015-04-18  Mike Frysinger  <vapier@gentoo.org>
 
 	* sim-main.h (SIM_ENGINE_HALT_HOOK, SIM_ENGINE_RESTART_HOOK): Delete

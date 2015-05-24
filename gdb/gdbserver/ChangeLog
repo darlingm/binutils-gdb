@@ -1,3 +1,8 @@
+2015-05-24  Michael Darling  <darlingm@gmail.com>
+
+	PR binutils/18450
+	* acinclude.m4: Reflects renaming of configure.in to configure.ac
+
 2015-05-15  Pedro Alves  <palves@redhat.com>
 
 	* target.h (target_handle_new_gdb_connection): Rewrite using if

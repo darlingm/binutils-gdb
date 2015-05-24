@@ -1,3 +1,11 @@
+2015-05-24  Michael Darling  <darlingm@gmail.com>
+
+	PR binutils/18450
+	* gettext.m4: Reflects renaming of configure.in to configure.ac
+	* po.m4: Reflects renaming of configure.in to configure.ac
+	* stdint.m4: Reflects renaming of configure.in to configure.ac
+	* tc1.m4: Reflects renaming of configure.in to configure.ac
+
 2015-04-02  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* zlib.m4 (AM_ZLIB): Set zlibdir to -L\$(top_builddir)/../zlib

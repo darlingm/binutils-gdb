@@ -1,3 +1,11 @@
+2015-05-24  Michael Darling  <darlingm@gmail.com>
+
+	PR binutils/18450
+	* INSTALL: Reflects renaming of configure.in to configure.ac
+	* MANIFEST: Reflects renaming of configure.in to configure.ac
+	* aclocal.m4: Reflects renaming of configure.in to configure.ac
+	* configure.ac: Renamed from configure.in
+
 2014-12-30  Eli Zaretskii  <eliz@gnu.org>
 
 	* complete.c (stat_char) [_WIN32]: Don't use 'access' and X_OK on

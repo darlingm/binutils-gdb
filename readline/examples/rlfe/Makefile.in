@@ -43,7 +43,7 @@ SHELL=/bin/sh
 
 CFILES=	rlfe.c pty.c
 HFILES= extern.h os.h screen.h
-EXTRA_DIST=configure.in configure Makefile.in config.h.in ChangeLog README
+EXTRA_DIST=configure.ac configure Makefile.in config.h.in ChangeLog README
 OFILES=	rlfe.o pty.o
 
 all:	rlfe
@@ -175,7 +175,7 @@ Makefile makefile:	config.status $(srcdir)/Makefile.in
 config.status:	$(srcdir)/configure
 	$(SHELL) ./config.status --recheck
 
-$(srcdir)/configure:	$(srcdir)/configure.in
+$(srcdir)/configure:	$(srcdir)/configure.ac
 	cd $(srcdir) && autoconf
 
 ###############################################################################

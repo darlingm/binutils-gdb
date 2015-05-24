@@ -48,7 +48,7 @@ DEVO_SUPPORT="README Makefile.in configure configure.ac \
 	COPYING3 COPYING3.LIB"
 
 # Files in devo/etc used in any net release.
-ETC_SUPPORT="Makefile.in configure configure.in standards.texi \
+ETC_SUPPORT="Makefile.in configure configure.ac standards.texi \
 	make-stds.texi standards.info* configure.texi configure.info* \
 	ChangeLog configbuild.* configdev.* fdl.texi texi2pod.pl gnu-oids.texi"
 

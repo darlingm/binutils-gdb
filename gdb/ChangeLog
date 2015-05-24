@@ -1,3 +1,10 @@
+2015-05-24  Michael Darling  <darlingm@gmail.com>
+
+	PR binutils/18450
+	* acinclude.m4: Reflects renaming of configure.in to configure.ac
+	* configure: Reflects renaming of configure.in to configure.ac
+	* config/djgpp/fnchange.lst: Reflects renaming of configure.in to configure.ac
+
 2015-05-22  Andrew Burgess  <andrew.burgess@embecosm.com>
 
 	* NEWS: Mention 'tui enable' and 'tui disable'.

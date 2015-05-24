@@ -1,3 +1,8 @@
+2015-05-24  Michael Darling  <darlingm@gmail.com>
+
+	* configure.ac: Renamed from configure.in
+	* Makefile.in: Reflects renaming of configure.in to configure.ac
+
 2014-06-27  Ludovic Courtès  <ludo@gnu.org>
 
 	PR external/16327

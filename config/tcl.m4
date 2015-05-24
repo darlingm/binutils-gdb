@@ -2136,7 +2136,7 @@ dnl # preprocessing tests use only CPPFLAGS.
             INSTALL_LIB='$(INSTALL_LIBRARY) $(LIB_FILE) $(LIB_INSTALL_DIR)/$(LIB_FILE) ; (cd $(LIB_INSTALL_DIR) ; $(RANLIB) $(LIB_FILE))'
         fi
 
-dnl        Not at all clear what this was doing in Tcl's configure.in
+dnl        Not at all clear what this was doing in Tcl's configure.ac
 dnl        or why it was needed was needed. In any event, this sort of
 dnl        things needs to be done in the big loop above.
 dnl        REMOVE THIS BLOCK LATER! (mdejong)

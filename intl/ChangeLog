@@ -1,3 +1,8 @@
+2015-05-24  Michael Darling  <darlingm@gmail.com>
+
+	PR binutils/18450
+	* configure: Reflects renaming of configure.in to configure.ac
+
 2010-06-27  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
 
 	PR bootstrap/44621
